@@ -50,6 +50,7 @@ cparser_SOURCES = \
 	ast2firm.c \
 	builtins.c \
 	diagnostic.c \
+	driver.c \
 	driver/firm_machine.c \
 	driver/firm_opt.c \
 	driver/firm_timing.c \
@@ -60,10 +61,12 @@ cparser_SOURCES = \
 	jump_target.c \
 	main.c \
 	mangle.c \
+	predefs.c \
 	preprocessor.c \
 	printer.c \
 	string_rep.c \
 	symbol_table.c \
+	tempfile.c \
 	token.c \
 	type.c \
 	type_hash.c \

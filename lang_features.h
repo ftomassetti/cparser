@@ -6,6 +6,7 @@
 #define LANG_FEATURES_H
 
 #include <stdbool.h>
+#include "driver/firm_machine.h"
 
 #define BITS_PER_BYTE    8
 
@@ -39,5 +40,9 @@ extern bool strict_mode;
 extern bool enable_main_collect2_hack;
 
 extern bool freestanding;
+
+/** parsed machine-triple of target machine. Try not to use this if possible
+ * but create specific variables for language features instead. */
+extern machine_triple_t *target_machine;
 
 #endif
