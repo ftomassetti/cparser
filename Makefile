@@ -173,6 +173,19 @@ $(builddir)/%.o: %.c
 	$(Q)$(QUICKCHECK) $(CPPFLAGS) $(QUICKCHECK_FLAGS) $<
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -MP -MMD -c -o $@ $<
 
+ppinfo/ppinfo: $(builddir)/ppinfo.o $(builddir)/preprocessor.o $(builddir)/symbol_table.o \
+	$(builddir)/input.o $(builddir)/diagnostic.o $(builddir)/token.o $(builddir)/ast.o \
+	$(builddir)/token.o $(builddir)/type.o $(builddir)/printer.o $(builddir)/warning.o \
+	$(builddir)/entity.o $(builddir)/parser.o $(builddir)/types.o $(builddir)/ast2firm.o \
+	$(builddir)/jump_target.o $(builddir)/mangle.o $(builddir)/entitymap.o \
+	$(builddir)/type_hash.o $(builddir)/help.o $(builddir)/attribute.o \
+	$(builddir)/adt/strutil.o $(builddir)/string_rep.o $(builddir)/builtins.o \
+	$(builddir)/walk.o $(builddir)/driver/firm_opt.o $(builddir)/driver/firm_timing.o \
+	$(builddir)/format_check.o
+	$(CC) $^ $(LIBFIRM_FILE) -o $@ $(LINKFLAGS) 
+
+ppinfo: ppinfo/ppinfo
+
 clean:
 	@echo '===> CLEAN'
 	$(Q)rm -rf $(builddir)
