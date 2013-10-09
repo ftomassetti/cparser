@@ -5,7 +5,7 @@
 #define _GNU_SOURCE
 
 #define TARGET_INCLUDE_DIR NULL
- #define PREPROCESSOR "cpp -U__STRICT_ANSI__"
+#define PREPROCESSOR "cpp -U__STRICT_ANSI__"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -118,5 +118,6 @@ int main(int argc, char* argv[])
 	init_mode();
 	init_preprocessor();
 	exit_preprocessor();
+	print_defines();
 	printf("...e termino senza bombare!\n");
 }

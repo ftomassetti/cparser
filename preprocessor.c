@@ -131,6 +131,26 @@ typedef struct macro_call_t {
 	bool             previous_may_recurse  : 1;
 } macro_call_t;
 
+typedef enum stdc_pragma_kind_t {
+	STDC_UNKNOWN,
+	STDC_FP_CONTRACT,
+	STDC_FENV_ACCESS,
+	STDC_CX_LIMITED_RANGE
+} stdc_pragma_kind_t;
+
+typedef enum stdc_pragma_value_kind_t {
+	STDC_VALUE_UNKNOWN,
+	STDC_VALUE_ON,
+	STDC_VALUE_OFF,
+	STDC_VALUE_DEFAULT
+} stdc_pragma_value_kind_t;
+
+struct searchpath_t {
+	searchpath_entry_t  *first;
+	searchpath_entry_t **anchor;
+	bool                 is_system_path;
+};
+
 static pp_input_t      input;
 
 static pp_input_t     *input_stack;
@@ -163,12 +183,6 @@ static pp_expansion_state_t *expansion_stack;
 static pp_argument_t        *argument_stack;
 static macro_call_t         *macro_call_stack;
 
-struct searchpath_t {
-	searchpath_entry_t  *first;
-	searchpath_entry_t **anchor;
-	bool                 is_system_path;
-};
-
 searchpath_t bracket_searchpath = { NULL, &bracket_searchpath.first, false };
 searchpath_t quote_searchpath   = { NULL, &quote_searchpath.first,   false };
 searchpath_t system_searchpath  = { NULL, &system_searchpath.first,  true  };
@@ -179,10 +193,6 @@ static whitespace_info_t next_info;
 static bool              next_space_before;
 static whitespace_info_t info;
 
-static inline void next_char(void);
-static void next_input_token(void);
-static void print_line_directive(const position_t *pos, const char *add);
-
 static symbol_t *symbol_colongreater;
 static symbol_t *symbol_lesscolon;
 static symbol_t *symbol_lesspercent;
@@ -191,6 +201,20 @@ static symbol_t *symbol_percentcolonpercentcolon;
 static symbol_t *symbol_percentgreater;
 
 static symbol_t *symbol___VA_ARGS__;
+
+static ir_tarval *pp_null;
+static ir_tarval *pp_one;
+
+static string_t pp_date;
+static string_t pp_time;
+
+static inline void next_char(void);
+static void next_input_token(void);
+static void print_line_directive(const position_t *pos, const char *add);
+
+static void       next_condition_token(void);
+static bool       next_expansion_token(void);
+static ir_tarval *parse_pp_expression(precedence_t prec);
 
 static void init_symbols(void)
 {
@@ -2619,9 +2643,6 @@ static void update_counter(pp_definition_t *definition)
 	++counter;
 }
 
-static string_t pp_date;
-static string_t pp_time;
-
 static void get_date_time(void)
 {
 	if (pp_date.begin)
@@ -3192,13 +3213,6 @@ void check_unclosed_conditionals(void)
 	}
 }
 
-static ir_tarval *pp_null;
-static ir_tarval *pp_one;
-
-static void       next_condition_token(void);
-static bool       next_expansion_token(void);
-static ir_tarval *parse_pp_expression(precedence_t prec);
-
 static ir_tarval *parse_pp_operand(void)
 {
 	token_kind_t const kind = pp_token.kind;
@@ -3655,20 +3669,6 @@ static void parse_endif_directive(void)
 	}
 	pop_conditional();
 }
-
-typedef enum stdc_pragma_kind_t {
-	STDC_UNKNOWN,
-	STDC_FP_CONTRACT,
-	STDC_FENV_ACCESS,
-	STDC_CX_LIMITED_RANGE
-} stdc_pragma_kind_t;
-
-typedef enum stdc_pragma_value_kind_t {
-	STDC_VALUE_UNKNOWN,
-	STDC_VALUE_ON,
-	STDC_VALUE_OFF,
-	STDC_VALUE_DEFAULT
-} stdc_pragma_value_kind_t;
 
 static void parse_pragma_directive(void)
 {
