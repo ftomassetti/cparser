@@ -8765,11 +8765,41 @@ static void semantic_logical_op(binary_expression_t *expression)
 	expression->base.type = dialect.cpp ? type_bool : type_int;
 }
 
+static bool is_ambiguous_unary_expression_kind(expression_kind_t expression_kind)
+{
+	switch (expression_kind) {
+		case EXPR_UNARY_DEREFERENCE:
+		case EXPR_UNARY_PLUS:
+		case EXPR_UNARY_NEGATE:
+			return true;
+		default:
+			return false;
+	}
+}
+
+static bool are_positions_contiguous(const position_t *pos_first,
+                                     const position_t *pos_second)
+{
+	return pos_first->lineno == pos_second->lineno &&
+	       pos_first->colno + 1 == pos_second->colno;
+}
+
 /**
  * Check the semantic restrictions of a binary assign expression.
  */
 static void semantic_binexpr_assign(binary_expression_t *expression)
 {
+	/* If an equal sign is followed by un infix operator without spaces
+	   than maybe it was intended to be as a compound assignment */
+	if (expression->base.kind == EXPR_BINARY_ASSIGN &&
+	    is_ambiguous_unary_expression_kind(expression->right->kind)) {
+		if (are_positions_contiguous(&expression->base.pos, &expression->right->base.pos)) {
+			warningf(WARN_OTHER, &expression->base.pos,
+			         "use of unary operator that may be intended as compound assignment (%hs%E)",
+			         "=", expression->right);
+		}
+	}
+
 	expression_t *left           = expression->left;
 	type_t       *orig_type_left = left->base.type;
 
