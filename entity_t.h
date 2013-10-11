@@ -81,6 +81,7 @@ typedef enum decl_modifier_t {
 	DM_MALLOC            = 1 << 26,
 	DM_WEAK              = 1 << 27,
 	DM_LEAF              = 1 << 28,
+	DM_COLD              = 1 << 29,
 } decl_modifier_t;
 
 typedef enum elf_visibility_tag_t {

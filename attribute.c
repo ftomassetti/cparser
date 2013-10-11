@@ -24,6 +24,7 @@ static const char *const attribute_names[ATTRIBUTE_LAST+1] = {
 	[ATTRIBUTE_GNU_ALLOC_SIZE]             = "alloc_size",
 	[ATTRIBUTE_GNU_ALWAYS_INLINE]          = "always_inline",
 	[ATTRIBUTE_GNU_CDECL]                  = "cdecl",
+	[ATTRIBUTE_GNU_COLD]                   = "cold",
 	[ATTRIBUTE_GNU_COMMON]                 = "common",
 	[ATTRIBUTE_GNU_CONST]                  = "const",
 	[ATTRIBUTE_GNU_CONSTRUCTOR]            = "constructor",
@@ -321,6 +322,7 @@ void handle_entity_attributes(const attribute_t *attributes, entity_t *entity)
 	const attribute_t *attribute = attributes;
 	for ( ; attribute != NULL; attribute = attribute->next) {
 		switch (attribute->kind) {
+		case ATTRIBUTE_GNU_COLD:          modifiers |= DM_COLD; break;
 		case ATTRIBUTE_GNU_CONST:         modifiers |= DM_CONST; break;
 		case ATTRIBUTE_GNU_DEPRECATED:    modifiers |= DM_DEPRECATED; break;
 		case ATTRIBUTE_GNU_NOINLINE:      modifiers |= DM_NOINLINE; break;
